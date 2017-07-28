@@ -6,8 +6,8 @@ require "digest/version"
 Gem::Specification.new do |spec|
   spec.name          = "digest"
   spec.version       = Digest::VERSION
-  spec.authors       = ["SHIBATA Hiroshi"]
-  spec.email         = ["hsbt@ruby-lang.org"]
+  spec.authors       = ["Akinori MUSHA"]
+  spec.email         = ["knu@idaemons.org"]
 
   spec.summary       = %q{Provides a framework for message digest libraries.}
   spec.description   = %q{Provides a framework for message digest libraries.}
