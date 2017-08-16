@@ -1,11 +1,8 @@
 # coding: utf-8
-lib = File.expand_path("../lib", __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "digest/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "digest"
-  spec.version       = Digest::VERSION
+  spec.version       = "0.1.0"
   spec.authors       = ["Akinori MUSHA"]
   spec.email         = ["knu@idaemons.org"]
 
@@ -24,7 +21,7 @@ Gem::Specification.new do |spec|
     "ext/digest/sha1/extconf.rb", "ext/digest/sha1/sha1.c", "ext/digest/sha1/sha1.h", "ext/digest/sha1/sha1cc.h",
     "ext/digest/sha1/sha1init.c", "ext/digest/sha1/sha1ossl.h", "ext/digest/sha2/extconf.rb", "ext/digest/sha2/lib/sha2.rb",
     "ext/digest/sha2/sha2.c", "ext/digest/sha2/sha2.h", "ext/digest/sha2/sha2cc.h", "ext/digest/sha2/sha2init.c",
-    "ext/digest/sha2/sha2ossl.h", "ext/digest/test.sh", "ext/openssl/deprecation.rb", "lib/digest.rb", "lib/digest/version.rb"
+    "ext/digest/sha2/sha2ossl.h", "ext/digest/test.sh", "ext/openssl/deprecation.rb", "lib/digest.rb"
   ]
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
