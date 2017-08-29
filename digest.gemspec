@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
     ext/digest/sha1/extconf.rb
     ext/digest/sha2/extconf.rb
   ]
+  spec.metadata["msys2_mingw_dependencies"] = "openssl"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
