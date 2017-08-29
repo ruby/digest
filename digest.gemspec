@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
     "ext/digest/sha2/sha2.c", "ext/digest/sha2/sha2.h", "ext/digest/sha2/sha2cc.h", "ext/digest/sha2/sha2init.c",
     "ext/digest/sha2/sha2ossl.h", "ext/digest/test.sh", "ext/openssl/deprecation.rb", "lib/digest.rb"
   ]
+  spec.required_ruby_version = ">= 2.5.0dev"
+  
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
