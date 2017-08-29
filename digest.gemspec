@@ -27,6 +27,14 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.extensions    = %w[
+    ext/digest/extconf.rb
+    ext/digest/bubblebabble/extconf.rb
+    ext/digest/md5/extconf.rb
+    ext/digest/rmd160/extconf.rb
+    ext/digest/sha1/extconf.rb
+    ext/digest/sha2/extconf.rb
+  ]
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
