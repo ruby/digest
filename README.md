@@ -1,5 +1,7 @@
 # Digest
 
+[![Build Status](https://travis-ci.org/ruby/digest.svg?branch=master)](https://travis-ci.org/ruby/digest)
+
 This module provides a framework for message digest libraries.
 
 You may want to look at OpenSSL::Digest as it supports more algorithms.
