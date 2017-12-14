@@ -1,0 +1,35 @@
+---
+version: "{build}"
+
+init:
+  - set PATH=C:\ruby%ruby_version%\bin;C:\Program Files\7-Zip;C:\Program Files\AppVeyor\BuildAgent;C:\Program Files\Git\cmd;C:\Windows\system32
+
+  - if %ruby_version%==_trunk (
+      appveyor DownloadFile https://ci.appveyor.com/api/projects/MSP-Greg/ruby-loco/artifacts/ruby_trunk.7z -FileName C:\ruby_trunk.7z &
+      7z x C:\ruby_trunk.7z -oC:\ruby_trunk &
+      C:\ruby_trunk\trunk_pkgs.cmd
+    )
+
+install:
+  - if %ruby_version%==23-x64 (
+      appveyor DownloadFile https://dl.bintray.com/oneclick/OpenKnapsack/x64/openssl-1.0.2j-x64-windows.tar.lzma &
+      7z e openssl-1.0.2j-x64-windows.tar.lzma &
+      7z x -y openssl-1.0.2j-x64-windows.tar
+    )
+  - gem install rake-compiler --no-document --env-shebang
+
+build_script:
+  - rake -rdevkit compile %R_SSL%
+
+test_script:
+  - rake test
+
+on_finish:
+ - ruby -v -ropenssl -e "puts OpenSSL::OPENSSL_VERSION"
+
+environment:
+  matrix:
+    - ruby_version: 23-x64
+      R_SSL: "-- --with-openssl-dir=C:/ruby23-x64 --enable-debug"
+    - ruby_version: 24-x64
+    - ruby_version: _trunk
