@@ -26,7 +26,7 @@ Or install it yourself as:
 
 ## Usage
 
-```
+```ruby
 require 'digest'
 
 # Compute a complete digest
@@ -53,7 +53,7 @@ sha256.hexdigest
 
 Additionally digests can be encoded in "bubble babble" format as a sequence of consonants and vowels which is more recognizable and comparable than a hexadecimal digest.
 
-```
+```ruby
 require 'digest/bubblebabble'
 
 Digest::SHA256.bubblebabble 'message' #=> "xopoh-fedac-fenyh-..."
