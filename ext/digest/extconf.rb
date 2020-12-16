@@ -8,4 +8,6 @@ $INSTALLFILES = {
   "digest.h" => "$(HDRDIR)"
 }
 
+have_func("rb_ext_ractor_safe")
+
 create_makefile("digest")
