@@ -1,6 +1,6 @@
 # Digest
 
-[![Build Status](https://travis-ci.org/ruby/digest.svg?branch=master)](https://travis-ci.org/ruby/digest)
+![CI](https://github.com/ruby/digest/workflows/CI/badge.svg?branch=master&event=push)
 
 This module provides a framework for message digest libraries.
 
