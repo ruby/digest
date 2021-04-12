@@ -18,6 +18,7 @@ jobs:
         - macos-10.15
         - windows-latest
         ruby:
+        - '3.0'
         - 2.7
         - 2.6
         - 2.5
@@ -25,6 +26,7 @@ jobs:
         - 2.3
         - debug
         include:
+        - { os: ubuntu-20.04 ,   ruby: head }
         - { os: windows-latest , ruby: mingw }
         - { os: windows-latest , ruby: mswin }
         exclude:
