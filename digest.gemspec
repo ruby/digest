@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
     "lib/digest.rb"
   ]
 
-  spec.required_ruby_version = ">= 2.3.0"
+  spec.required_ruby_version = ">= 2.5.0"
 
   spec.bindir        = "exe"
   spec.executables   = []
@@ -40,8 +40,4 @@ Gem::Specification.new do |spec|
     ext/digest/sha2/extconf.rb
   ]
   spec.metadata["msys2_mingw_dependencies"] = "openssl"
-
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rake-compiler"
 end
