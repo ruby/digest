@@ -22,7 +22,6 @@ jobs:
         - 2.7
         - 2.6
         - 2.5
-        - 2.4
         - debug
         include:
         - { os: ubuntu-20.04 ,   ruby: head }
