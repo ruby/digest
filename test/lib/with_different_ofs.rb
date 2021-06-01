@@ -17,6 +17,7 @@ module DifferentOFS
 
   def self.extended(klass)
     super(klass)
-    klass.const_set(:DifferentOFS, Class.new(klass).class_eval {include WithDifferentOFS})[0].name
+    c = klass.const_set(:DifferentOFS, Class.new(klass).class_eval {include WithDifferentOFS})
+    c.is_a?(Array) ? c[0].name : c.name
   end
 end
