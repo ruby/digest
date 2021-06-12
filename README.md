@@ -95,3 +95,5 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/ruby/d
 ## License
 
 The gem is available as open source under the terms of the [2-Clause BSD License](https://opensource.org/licenses/BSD-2-Clause).
+
+Files under ext/java (JRuby's digest) are licensed under [Eclipse Public License version 2.0](https://opensource.org/licenses/EPL-2.0), [GNU General Public License version 2](https://opensource.org/licenses/GPL-2.0), [GNU Lesser General Public License version 2.1](https://opensource.org/licenses/LGPL-2.1).
