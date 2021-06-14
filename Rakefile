@@ -21,10 +21,12 @@ require 'fileutils'
   FileUtils.cp "./ext/digest/#{ext}/lib/#{ext}.rb", "./lib/digest/#{ext}.rb"
 end
 
-require 'rake/extensiontask'
-Rake::ExtensionTask.new("digest")
-%w(bubblebabble md5 rmd160 sha1 sha2).each do |ext|
-  Rake::ExtensionTask.new("digest/#{ext}")
+if RUBY_ENGINE != 'jruby'
+  require 'rake/extensiontask'
+  Rake::ExtensionTask.new("digest")
+  %w(bubblebabble md5 rmd160 sha1 sha2).each do |ext|
+    Rake::ExtensionTask.new("digest/#{ext}")
+  end
 end
 
 task :sync_tool do
