@@ -8,7 +8,7 @@ module Digest
   def self.const_missing(name) # :nodoc:
     case name
     when :SHA256, :SHA384, :SHA512
-      lib = 'digest/sha2.so'
+      lib = 'digest/sha2.rb'
     else
       lib = File.join('digest', name.to_s.downcase)
     end
