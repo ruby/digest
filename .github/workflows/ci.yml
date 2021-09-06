@@ -1,8 +1,10 @@
 name: CI
 
 on:
-- push
-- pull_request
+  push:
+  pull_request:
+  schedule:
+    - cron: '15 9 * * *'
 
 jobs:
   host:
