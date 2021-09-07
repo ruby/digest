@@ -9,6 +9,7 @@ on:
 jobs:
   host:
     name: ${{ matrix.os }} ${{ matrix.ruby }}
+    if: ${{ github.repository == 'ruby/digest' || github.event_name != 'schedule' }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -26,11 +27,11 @@ jobs:
         - 2.5
         - debug
         include:
-        - { os: ubuntu-20.04 ,   ruby: head }
-        - { os: windows-latest , ruby: mingw }
-        - { os: windows-latest , ruby: mswin }
+        - { os: ubuntu-20.04,   ruby: head, ignore-pkg-error: true }
+        - { os: windows-latest, ruby: mingw, ignore-pkg-error: true }
+        - { os: windows-latest, ruby: mswin, ignore-pkg-error: true }
         exclude:
-        - { os: windows-latest , ruby: debug }
+        - { os: windows-latest, ruby: debug }
 
     steps:
       - uses: actions/checkout@v2
@@ -49,4 +50,4 @@ jobs:
       - run: rake test
 
       - run: gem install pkg/*.gem
-        continue-on-error: ${{ [ 'head', 'debug', 'mingw', 'mswin'].contains(matrix.ruby) }}
+        continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
