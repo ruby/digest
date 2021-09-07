@@ -49,3 +49,4 @@ jobs:
       - run: rake test
 
       - run: gem install pkg/*.gem
+        continue-on-error: ${{ [ 'head', 'debug', 'mingw', 'mswin'].contains(matrix.ruby) }}
