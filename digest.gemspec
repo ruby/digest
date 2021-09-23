@@ -45,19 +45,22 @@ Gem::Specification.new do |spec|
 
   spec.bindir        = "exe"
   spec.executables   = []
-  spec.require_paths = ["lib"]
 
   if Gem::Platform === spec.platform and spec.platform =~ 'java' or RUBY_ENGINE == 'jruby'
     spec.platform = 'java'
+    spec.require_paths = ["lib/java"]
+    spec.files.reject! {|path| path.start_with?("ext/")}
     spec.files.concat [
-      "lib/digest.jar",
-      "lib/digest/md5.rb",
-      "lib/digest/sha1.rb",
-      "lib/digest/sha2.rb",
-      "lib/digest/rmd160.rb",
-      "lib/digest/bubblebabble.rb"
+      "lib/java/digest.jar",
+      "lib/java/digest.rb",
+      "lib/java/digest/md5.rb",
+      "lib/java/digest/sha1.rb",
+      "lib/java/digest/sha2.rb",
+      "lib/java/digest/rmd160.rb",
+      "lib/java/digest/bubblebabble.rb"
     ]
   else
+    spec.require_paths = ["lib"]
     spec.extensions    = %w[
       ext/digest/extconf.rb
       ext/digest/bubblebabble/extconf.rb

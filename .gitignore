@@ -7,9 +7,7 @@
 /pkg/
 /spec/reports/
 /tmp/
-lib/*.jar
-lib/digest
-lib/digest/*.rb
+/lib/
 *.bundle
 *.so
 *.o
