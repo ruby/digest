@@ -8,8 +8,6 @@
 /spec/reports/
 /tmp/
 lib/*.jar
-lib/digest
-lib/digest/*.rb
 *.bundle
 *.so
 *.o
