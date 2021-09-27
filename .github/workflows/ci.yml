@@ -44,11 +44,11 @@ jobs:
 
       - run: bundle install
 
-      - run: rake compile
+      - run: bundle exec rake compile
 
-      - run: rake build
+      - run: bundle exec rake build
 
-      - run: rake test
+      - run: bundle exec rake test
 
       - run: gem install pkg/*.gem
         continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
