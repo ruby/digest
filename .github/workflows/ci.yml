@@ -41,8 +41,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-
-      - run: bundle install
+          bundler-cache: true # 'bundle install' and cache
 
       - run: bundle exec rake compile
 
