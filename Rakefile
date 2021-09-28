@@ -33,4 +33,41 @@ task :sync_tool do
   cp "../ruby/tool/lib/find_executable.rb", "./test/lib"
 end
 
+task :check => :"install:local" do
+  spec = Gem::Specification::load("digest.gemspec")
+  version = spec.version.to_s
+
+  require_relative "test/lib/envutil"
+
+  _, _, status = EnvUtil.invoke_ruby([], <<~EOS)
+    version = #{version.dump}
+    gem "digest", version
+    loaded_version = Gem.loaded_specs["digest"].version.to_s
+
+    if loaded_version == version
+      puts "digest \#{loaded_version} is loaded."
+    else
+      abort "digest \#{loaded_version} is loaded instead of \#{version}!"
+    end
+
+    require "digest"
+
+    string = "digest"
+    actual = Digest::SHA256.hexdigest(string)
+    expected = "0bf474896363505e5ea5e5d6ace8ebfb13a760a409b1fb467d428fc716f9f284"
+    puts "sha256(\#{string.dump}) = \#{actual.dump}"
+
+    if actual != expected
+      abort "no! expected to be \#{expected.dump}!"
+    end
+  EOS
+
+  if status.success?
+    puts "check succeeded!"
+  else
+    warn "check failed!"
+    exit status.exitstatus
+  end
+end
+
 task :default => :test
