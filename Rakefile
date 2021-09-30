@@ -19,6 +19,8 @@ if RUBY_ENGINE == "jruby"
     ext.target_version = "1.8"
     ext.ext_dir = "ext/java"
   end
+
+  task :build => :compile
 else
   require "rake/extensiontask"
   Rake::ExtensionTask.new("digest")
