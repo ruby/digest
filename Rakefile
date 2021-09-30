@@ -34,48 +34,46 @@ task :sync_tool do
 end
 
 task :check do
-  if ENV.key?("BUNDLER_VERSION")
-    abort "run me without bundle exec."
-  end
+  Bundler.with_unbundled_env do
+    spec = Gem::Specification::load("digest.gemspec")
+    version = spec.version.to_s
 
-  spec = Gem::Specification::load("digest.gemspec")
-  version = spec.version.to_s
+    gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
+    File.size?(gem) or abort "gem not built!"
 
-  gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
-  File.size?(gem) or abort "gem not built!"
+    sh "gem", "install", gem
 
-  sh "gem", "install", gem
+    require_relative "test/lib/envutil"
 
-  require_relative "test/lib/envutil"
+    _, _, status = EnvUtil.invoke_ruby([], <<~EOS)
+      version = #{version.dump}
+      gem "digest", version
+      loaded_version = Gem.loaded_specs["digest"].version.to_s
 
-  _, _, status = EnvUtil.invoke_ruby([], <<~EOS)
-    version = #{version.dump}
-    gem "digest", version
-    loaded_version = Gem.loaded_specs["digest"].version.to_s
+      if loaded_version == version
+        puts "digest \#{loaded_version} is loaded."
+      else
+        abort "digest \#{loaded_version} is loaded instead of \#{version}!"
+      end
 
-    if loaded_version == version
-      puts "digest \#{loaded_version} is loaded."
+      require "digest"
+
+      string = "digest"
+      actual = Digest::SHA256.hexdigest(string)
+      expected = "0bf474896363505e5ea5e5d6ace8ebfb13a760a409b1fb467d428fc716f9f284"
+      puts "sha256(\#{string.dump}) = \#{actual.dump}"
+
+      if actual != expected
+        abort "no! expected to be \#{expected.dump}!"
+      end
+    EOS
+
+    if status.success?
+      puts "check succeeded!"
     else
-      abort "digest \#{loaded_version} is loaded instead of \#{version}!"
+      warn "check failed!"
+      exit status.exitstatus
     end
-
-    require "digest"
-
-    string = "digest"
-    actual = Digest::SHA256.hexdigest(string)
-    expected = "0bf474896363505e5ea5e5d6ace8ebfb13a760a409b1fb467d428fc716f9f284"
-    puts "sha256(\#{string.dump}) = \#{actual.dump}"
-
-    if actual != expected
-      abort "no! expected to be \#{expected.dump}!"
-    end
-  EOS
-
-  if status.success?
-    puts "check succeeded!"
-  else
-    warn "check failed!"
-    exit status.exitstatus
   end
 end
 
