@@ -33,9 +33,18 @@ task :sync_tool do
   cp "../ruby/tool/lib/find_executable.rb", "./test/lib"
 end
 
-task :check => :"install:local" do
+task :check do
+  if ENV.key?("BUNDLER_VERSION")
+    abort "run me without bundle exec."
+  end
+
   spec = Gem::Specification::load("digest.gemspec")
   version = spec.version.to_s
+
+  gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
+  File.size?(gem) or abort "gem not built!"
+
+  sh "gem", "install", gem
 
   require_relative "test/lib/envutil"
 
