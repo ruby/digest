@@ -17,19 +17,20 @@ jobs:
         os:
         - ubuntu-20.04
         - ubuntu-18.04
-        - macos-11.0
+        - macos-11
         - macos-10.15
         - windows-latest
         ruby:
         - '3.0'
         - 2.7
         - 2.6
-        - 2.5
         - debug
         include:
         - { os: ubuntu-20.04,   ruby: head, ignore-pkg-error: true }
         - { os: windows-latest, ruby: mingw, ignore-pkg-error: true }
         - { os: windows-latest, ruby: mswin, ignore-pkg-error: true }
+        - { os: ubuntu-20.04,   ruby: jruby }
+        - { os: ubuntu-20.04,   ruby: jruby-head, ignore-pkg-error: true }
         exclude:
         - { os: windows-latest, ruby: debug }
 
@@ -43,11 +44,11 @@ jobs:
 
       - run: bundle install
 
-      - run: rake compile
+      - run: bundle exec rake compile
 
-      - run: rake build
+      - run: bundle exec rake build
 
-      - run: rake test
+      - run: bundle exec rake test
 
-      - run: gem install pkg/*.gem
+      - run: rake check
         continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
