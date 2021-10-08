@@ -26,7 +26,7 @@ jobs:
         - 2.6
         - debug
         include:
-        - { os: ubuntu-20.04,   ruby: head, ignore-pkg-error: true }
+        - { os: ubuntu-20.04,   ruby: head }
         - { os: windows-latest, ruby: mingw, ignore-pkg-error: true }
         - { os: windows-latest, ruby: mswin, ignore-pkg-error: true }
         - { os: ubuntu-20.04,   ruby: jruby }
