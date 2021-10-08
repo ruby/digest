@@ -53,4 +53,4 @@ jobs:
 
       - name: Integration test
         run: bundle exec rake check
-        continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
+        # continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
