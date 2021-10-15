@@ -14,6 +14,7 @@
 #   %r{/(rubygems/gem_runner|bundler/cli)\.rb}.match?(l.path)
 # }
 
+require 'digest/version'
 require 'digest/loader'
 
 module Digest
