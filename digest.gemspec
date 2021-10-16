@@ -1,9 +1,11 @@
 # coding: utf-8
 # frozen_string_literal: true
 
+require_relative 'lib/digest/version'
+
 Gem::Specification.new do |spec|
   spec.name          = "digest"
-  spec.version       = "3.1.0.pre2"
+  spec.version       = Digest::VERSION
   spec.authors       = ["Akinori MUSHA"]
   spec.email         = ["knu@idaemons.org"]
 
