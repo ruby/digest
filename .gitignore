@@ -11,3 +11,5 @@ lib/*.jar
 *.bundle
 *.so
 *.o
+.*.time
+Makefile
