@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   else
     spec.extensions = Dir["ext/digest/**/extconf.rb"]
 
-    spec.files += Dir["ext/digest/**/*.{rb,c,h,sh}"]
+    spec.files += Dir["ext/digest/**/{*.{rb,c,h,sh},depend}"]
     spec.require_paths = %w[lib]
   end
 
