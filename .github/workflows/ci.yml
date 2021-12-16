@@ -53,4 +53,5 @@ jobs:
 
       - name: Integration test
         run: bundle exec rake check
+        if: ${{ ( matrix.ruby != 'debug' && matrix.os == 'linux-latest' ) || ( matrix.ruby != 'debug' && matrix.os == 'macos-latest' ) }}
         # continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
