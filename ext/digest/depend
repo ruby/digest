@@ -1,0 +1,3 @@
+do-install-rb: do-install-headers
+do-install-headers:
+	$(Q) $(RUBY) install_headers.rb $(srcdir)/digest.h $(DESTDIR)$(HDRDIR)
