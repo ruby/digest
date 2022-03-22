@@ -17,7 +17,7 @@ require 'digest/loader'
 
 module Digest
   # A mutex for Digest().
-  REQUIRE_MUTEX = Thread::Mutex.new
+  REQUIRE_MUTEX ||= Thread::Mutex.new
 
   def self.const_missing(name) # :nodoc:
     case name
