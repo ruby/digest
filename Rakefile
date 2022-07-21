@@ -43,11 +43,14 @@ task :check do
     gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
     File.size?(gem) or abort "gem not built!"
 
-    sh "gem", "install", gem
-
     require_relative "test/lib/envutil"
 
-    _, _, status = EnvUtil.invoke_ruby([], <<~EOS)
+    require 'tmpdir'
+    status = Dir.mktmpdir do |tmpdir|
+      tmpdir = File.realpath(tmpdir)
+      sh "gem", "install", "--install-dir", tmpdir, "--no-document", gem
+
+      _, _, status = EnvUtil.invoke_ruby([{"GEM_HOME"=>tmpdir}], <<~EOS)
       version = #{version.dump}
       gem "digest", version
       loaded_version = Gem.loaded_specs["digest"].version.to_s
@@ -60,6 +63,13 @@ task :check do
 
       require "digest"
 
+      unless RUBY_ENGINE == "jruby"
+        found = $".select {|path| path.end_with?("/digest.#{RbConfig::CONFIG["DLEXT"]}")}
+        unless found.size == 1 and found.first.start_with?(#{tmpdir.dump})
+          abort "Unexpected digest is loaded: \#{found.inspect}"
+        end
+      end
+
       string = "digest"
       actual = Digest::SHA256.hexdigest(string)
       expected = "0bf474896363505e5ea5e5d6ace8ebfb13a760a409b1fb467d428fc716f9f284"
@@ -68,7 +78,9 @@ task :check do
       if actual != expected
         abort "no! expected to be \#{expected.dump}!"
       end
-    EOS
+      EOS
+      status
+    end
 
     if status.success?
       puts "check succeeded!"
