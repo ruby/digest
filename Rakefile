@@ -43,11 +43,13 @@ task :check do
     gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
     File.size?(gem) or abort "gem not built!"
 
-    sh "gem", "install", gem
-
     require_relative "test/lib/envutil"
 
-    _, _, status = EnvUtil.invoke_ruby([], <<~EOS)
+    require 'tmpdir'
+    status = Dir.mktmpdir do |tmpdir|
+      sh "gem", "install", "--install-dir", tmpdir, "--no-document", gem
+
+      _, _, status = EnvUtil.invoke_ruby([{"GEM_HOME"=>tmpdir}], <<~EOS)
       version = #{version.dump}
       gem "digest", version
       loaded_version = Gem.loaded_specs["digest"].version.to_s
@@ -68,7 +70,9 @@ task :check do
       if actual != expected
         abort "no! expected to be \#{expected.dump}!"
       end
-    EOS
+      EOS
+      status
+    end
 
     if status.success?
       puts "check succeeded!"
