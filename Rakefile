@@ -47,6 +47,7 @@ task :check do
 
     require 'tmpdir'
     status = Dir.mktmpdir do |tmpdir|
+      tmpdir = File.realpath(tmpdir)
       sh "gem", "install", "--install-dir", tmpdir, "--no-document", gem
 
       _, _, status = EnvUtil.invoke_ruby([{"GEM_HOME"=>tmpdir}], <<~EOS)
@@ -61,6 +62,13 @@ task :check do
       end
 
       require "digest"
+
+      unless RUBY_ENGINE == "jruby"
+        found = $".select {|path| path.end_with?("/digest.#{RbConfig::CONFIG["DLEXT"]}")}
+        unless found.size == 1 and found.first.start_with?(#{tmpdir.dump})
+          abort "Unexpected digest is loaded: \#{found.inspect}"
+        end
+      end
 
       string = "digest"
       actual = Digest::SHA256.hexdigest(string)
