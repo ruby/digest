@@ -30,7 +30,7 @@ jobs:
         - { os: windows-latest, ruby: mingw, ignore-pkg-error: true }
         - { os: windows-latest, ruby: mswin, ignore-pkg-error: true }
         - { os: ubuntu-20.04,   ruby: jruby }
-        - { os: ubuntu-20.04,   ruby: jruby-head, ignore-pkg-error: true }
+        - { os: ubuntu-20.04,   ruby: jruby-head, ignore-pkg-error: true, ignore-error: true }
         exclude:
         - { os: windows-latest, ruby: debug }
 
@@ -50,6 +50,7 @@ jobs:
       - run: bundle exec rake build
 
       - run: bundle exec rake test
+        continue-on-error: ${{ matrix.ignore-error }}
 
       - name: Integration test
         run: bundle exec rake check
