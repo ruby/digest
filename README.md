@@ -82,6 +82,16 @@ SHA2 family::
 
 The latest versions of the FIPS publications can be found here: http://csrc.nist.gov/publications/PubsFIPS.html.
 
+## For Gem developers
+
+If you want to use digest algorithms in your C extension, you can use the `digest.h` header file provided by digest gem. You should add the following code to your `extconf.rb`:
+
+```ruby
+spec = Gem::Specification.find_by_name("digest")
+source_dir = File.join(spec.full_gem_path, "ext", "digest")
+$INCFLAGS += " -I#{source_dir}"
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
