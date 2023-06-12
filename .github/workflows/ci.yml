@@ -7,7 +7,15 @@ on:
     - cron: '15 9 * * *'
 
 jobs:
+  ruby-versions:
+    uses: ruby/actions/.github/workflows/ruby_versions.yml@master
+    with:
+      engine: cruby
+      # versions: ["debug"]
+      min_version: 2.7
+
   host:
+    needs: ruby-versions
     name: ${{ matrix.os }} ${{ matrix.ruby }}
     if: ${{ github.repository == 'ruby/digest' || github.event_name != 'schedule' }}
     runs-on: ${{ matrix.os }}
@@ -17,22 +25,18 @@ jobs:
         os:
         - ubuntu-22.04
         - ubuntu-20.04
+        - macos-13
         - macos-12
-        - macos-11
         - windows-latest
-        ruby:
-        - '3.1'
-        - '3.0'
-        - 2.7
-        - debug
+        ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         include:
-        - { os: ubuntu-20.04,   ruby: head, ignore-pkg-error: true }
-        - { os: windows-latest, ruby: mingw, ignore-pkg-error: true }
-        - { os: windows-latest, ruby: mswin, ignore-pkg-error: true }
+        - { os: windows-latest, ruby: ucrt }
+        - { os: windows-latest, ruby: mswin }
         - { os: ubuntu-20.04,   ruby: jruby }
-        - { os: ubuntu-20.04,   ruby: jruby-head, ignore-pkg-error: true, ignore-error: true }
+        - { os: ubuntu-20.04,   ruby: jruby-head }
         exclude:
         - { os: windows-latest, ruby: debug }
+        - { os: windows-latest, ruby: head }
 
     steps:
       - uses: actions/checkout@v3
