@@ -43,7 +43,7 @@ task :check do
     gem = "pkg/digest-#{version}#{"-java" if RUBY_ENGINE == "jruby"}.gem"
     File.size?(gem) or abort "gem not built!"
 
-    require_relative "test/lib/envutil"
+    require "envutil"
 
     require 'tmpdir'
     status = Dir.mktmpdir do |tmpdir|
