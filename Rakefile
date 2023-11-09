@@ -29,12 +29,6 @@ else
   end
 end
 
-task :sync_tool do
-  cp "../ruby/tool/lib/core_assertions.rb", "./test/lib"
-  cp "../ruby/tool/lib/envutil.rb", "./test/lib"
-  cp "../ruby/tool/lib/find_executable.rb", "./test/lib"
-end
-
 task :check do
   Bundler.with_unbundled_env do
     spec = Gem::Specification::load("digest.gemspec")
