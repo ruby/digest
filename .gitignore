@@ -7,6 +7,8 @@
 /pkg/
 /spec/reports/
 /tmp/
+/lib/digest/loader.rb
+/lib/digest/sha2/loader.rb
 lib/*.jar
 *.bundle
 *.so
