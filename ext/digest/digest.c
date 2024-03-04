@@ -37,29 +37,36 @@ RUBY_EXTERN void Init_digest_base(void);
  * are also called one-way functions, it is easy to compute a digest from
  * a message, but it is infeasible to generate a message from a digest.
  *
+ * Prefer using the thread-safe <tt>Digest()</tt> method to dynamically look up
+ * an algorithm.
+ *
+ * If you are accessing an algorithm directly via its constant, ensure you
+ * explicitly require the algorithm under the <tt>digest/</tt> path (ex. <tt>digest/sha2</tt>).
+ * Relying on the constant lookup via +const_missing+ is not thread-safe.
+ *
  * == Examples
  *
  *   require 'digest'
  *
  *   # Compute a complete digest
- *   Digest::SHA256.digest 'message'       #=> "\xABS\n\x13\xE4Y..."
+ *   Digest(:SHA256).digest 'message'       #=> "\xABS\n\x13\xE4Y..."
  *
- *   sha256 = Digest::SHA256.new
+ *   sha256 = Digest(:SHA256).new
  *   sha256.digest 'message'               #=> "\xABS\n\x13\xE4Y..."
  *
  *   # Other encoding formats
- *   Digest::SHA256.hexdigest 'message'    #=> "ab530a13e459..."
- *   Digest::SHA256.base64digest 'message' #=> "q1MKE+RZFJgr..."
+ *   Digest(:SHA256).hexdigest 'message'    #=> "ab530a13e459..."
+ *   Digest(:SHA256).base64digest 'message' #=> "q1MKE+RZFJgr..."
  *
  *   # Compute digest by chunks
- *   md5 = Digest::MD5.new
+ *   md5 = Digest(:MD5).new
  *   md5.update 'message1'
  *   md5 << 'message2'                     # << is an alias for update
  *
  *   md5.hexdigest                         #=> "94af09c09bb9..."
  *
  *   # Compute digest for a file
- *   sha256 = Digest::SHA256.file 'testfile'
+ *   sha256 = Digest(:SHA256).file 'testfile'
  *   sha256.hexdigest
  *
  * Additionally digests can be encoded in "bubble babble" format as a sequence
