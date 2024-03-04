@@ -37,6 +37,13 @@ RUBY_EXTERN void Init_digest_base(void);
  * are also called one-way functions, it is easy to compute a digest from
  * a message, but it is infeasible to generate a message from a digest.
  *
+ * Prefer using the thread-safe <tt>Digest()</tt> method to dynamically look up
+ * an algorithm.
+ *
+ * If you are accessing an algorithm directly via its constant, ensure you
+ * explicitly require the algorithm under the <tt>digest/</tt> path (ex. <tt>digest/sha2</tt>).
+ * Relying on the constant lookup via +const_missing+ is not thread-safe.
+ *
  * == Examples
  *
  *   require 'digest'
