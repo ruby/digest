@@ -49,24 +49,24 @@ RUBY_EXTERN void Init_digest_base(void);
  *   require 'digest'
  *
  *   # Compute a complete digest
- *   Digest::SHA256.digest 'message'       #=> "\xABS\n\x13\xE4Y..."
+ *   Digest(:SHA256).digest 'message'       #=> "\xABS\n\x13\xE4Y..."
  *
- *   sha256 = Digest::SHA256.new
+ *   sha256 = Digest(:SHA256).new
  *   sha256.digest 'message'               #=> "\xABS\n\x13\xE4Y..."
  *
  *   # Other encoding formats
- *   Digest::SHA256.hexdigest 'message'    #=> "ab530a13e459..."
- *   Digest::SHA256.base64digest 'message' #=> "q1MKE+RZFJgr..."
+ *   Digest(:SHA256).hexdigest 'message'    #=> "ab530a13e459..."
+ *   Digest(:SHA256).base64digest 'message' #=> "q1MKE+RZFJgr..."
  *
  *   # Compute digest by chunks
- *   md5 = Digest::MD5.new
+ *   md5 = Digest(:MD5).new
  *   md5.update 'message1'
  *   md5 << 'message2'                     # << is an alias for update
  *
  *   md5.hexdigest                         #=> "94af09c09bb9..."
  *
  *   # Compute digest for a file
- *   sha256 = Digest::SHA256.file 'testfile'
+ *   sha256 = Digest(:SHA256).file 'testfile'
  *   sha256.hexdigest
  *
  * Additionally digests can be encoded in "bubble babble" format as a sequence
