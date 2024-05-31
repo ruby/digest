@@ -25,6 +25,17 @@ static ID id_metadata;
 
 RUBY_EXTERN void Init_digest_base(void);
 
+static const rb_data_type_t digest_metadata_type = {
+    .wrap_struct_name = "digest/metadata",
+    .flags = RUBY_TYPED_FREE_IMMEDIATELY | RUBY_TYPED_WB_PROTECTED,
+};
+
+VALUE
+rb_digest_make_metadata(const rb_digest_metadata_t *meta)
+{
+    return TypedData_Wrap_Struct(0, &digest_metadata_type, (void *)meta);
+}
+
 /*
  * Document-module: Digest
  *
@@ -534,7 +545,7 @@ rb_digest_class_init(VALUE self)
  *
  *
  *  rb_ivar_set(cDigest_SHA1, rb_intern("metadata"),
- *		Data_Wrap_Struct(0, 0, 0, (void *)&sha1));
+ *      rb_digest_make_metadata(&sha1));
  */
 
 static rb_digest_metadata_t *
@@ -542,7 +553,6 @@ get_digest_base_metadata(VALUE klass)
 {
     VALUE p;
     VALUE obj;
-    rb_digest_metadata_t *algo;
 
     for (p = klass; !NIL_P(p); p = rb_class_superclass(p)) {
         if (rb_ivar_defined(p, id_metadata)) {
@@ -554,7 +564,7 @@ get_digest_base_metadata(VALUE klass)
     if (NIL_P(p))
         rb_raise(rb_eRuntimeError, "Digest::Base cannot be directly inherited in Ruby");
 
-    if (!RB_TYPE_P(obj, T_DATA) || RTYPEDDATA_P(obj)) {
+    if (!RB_TYPE_P(obj, T_DATA)) {
       wrong:
         if (p == klass)
             rb_raise(rb_eTypeError, "%"PRIsVALUE"::metadata is not initialized properly",
@@ -564,9 +574,7 @@ get_digest_base_metadata(VALUE klass)
                      klass, p);
     }
 
-#undef RUBY_UNTYPED_DATA_WARNING
-#define RUBY_UNTYPED_DATA_WARNING 0
-    Data_Get_Struct(obj, rb_digest_metadata_t, algo);
+    rb_digest_metadata_t *algo = DATA_PTR(obj);
 
     if (!algo) goto wrong;
 
