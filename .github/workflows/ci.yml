@@ -23,20 +23,20 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - ubuntu-22.04
-        - ubuntu-20.04
-        - macos-13
-        - macos-12
-        - windows-latest
+          - ubuntu-22.04
+          - ubuntu-20.04
+          - macos-13
+          - macos-12
+          - windows-latest
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         include:
-        - { os: windows-latest, ruby: ucrt }
-        - { os: windows-latest, ruby: mswin }
-        - { os: ubuntu-20.04,   ruby: jruby }
-        - { os: ubuntu-20.04,   ruby: jruby-head }
+          - { os: windows-latest, ruby: ucrt }
+          - { os: windows-latest, ruby: mswin }
+          - { os: ubuntu-22.04,   ruby: jruby }
+          - { os: ubuntu-22.04,   ruby: jruby-head }
         exclude:
-        - { os: windows-latest, ruby: debug }
-        - { os: windows-latest, ruby: head }
+          - { os: windows-latest, ruby: debug }
+          - { os: windows-latest, ruby: head }
 
     steps:
       - uses: actions/checkout@v4
@@ -54,8 +54,8 @@ jobs:
       - run: bundle exec rake build
 
       - run: bundle exec rake test
-        continue-on-error: ${{ matrix.ignore-error }}
+        continue-on-error: ${{ matrix.ignore-error || false }}
 
       - name: Integration test
         run: bundle exec rake check
-        # continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') }}
+        # continue-on-error: ${{ matrix.ignore-pkg-error || (matrix.ruby == 'debug') || false }}
