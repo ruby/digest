@@ -12,7 +12,7 @@ jobs:
     with:
       engine: cruby
       # versions: ["debug"]
-      min_version: 2.7
+      min_version: 3.3
 
   host:
     needs: ruby-versions
@@ -24,16 +24,11 @@ jobs:
       matrix:
         os:
         - ubuntu-22.04
-        - ubuntu-20.04
-        - macos-13
-        - macos-12
         - windows-latest
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         include:
         - { os: windows-latest, ruby: ucrt }
         - { os: windows-latest, ruby: mswin }
-        - { os: ubuntu-20.04,   ruby: jruby }
-        - { os: ubuntu-20.04,   ruby: jruby-head }
         exclude:
         - { os: windows-latest, ruby: debug }
         - { os: windows-latest, ruby: head }
@@ -49,6 +44,14 @@ jobs:
 
       - run: ruby --version
 
+      - name: Apply rubygems/rubygems#7727
+        run: |
+          patch=https://patch-diff.githubusercontent.com/raw/rubygems/rubygems/pull/7727.patch
+          libdir=`ruby -rrubygems/specification -e 'puts File.dirname($".find {|f| f.end_with?("/rubygems/specification.rb")})'`
+          curl "$patch" | patch -d "$libdir" -p3
+        shell: bash
+        if: ${{ matrix.ruby == 'ucrt' || matrix.ruby == 'mswin' || matrix.ruby == 'head' }}
+
       - run: bundle exec rake compile
 
       - run: bundle exec rake build
@@ -62,5 +65,4 @@ jobs:
           ${{
           matrix.ignore-pkg-error ||
           (matrix.ruby == 'debug') ||
-          startsWith(matrix.os, 'windows') ||
           false }}
