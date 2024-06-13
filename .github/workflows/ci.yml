@@ -62,5 +62,4 @@ jobs:
           ${{
           matrix.ignore-pkg-error ||
           (matrix.ruby == 'debug') ||
-          startsWith(matrix.os, 'windows') ||
           false }}
