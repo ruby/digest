@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
+        - ubuntu-24.04
         - ubuntu-22.04
-        - ubuntu-20.04
         - macos-14
         - macos-13
         - windows-latest
@@ -32,8 +32,8 @@ jobs:
         include:
         - { os: windows-latest, ruby: ucrt }
         - { os: windows-latest, ruby: mswin }
-        - { os: ubuntu-20.04,   ruby: jruby }
-        - { os: ubuntu-20.04,   ruby: jruby-head }
+        - { os: ubuntu-22.04,   ruby: jruby }
+        - { os: ubuntu-22.04,   ruby: jruby-head }
         exclude:
         - { os: windows-latest, ruby: debug }
         - { os: windows-latest, ruby: head }
