@@ -24,7 +24,7 @@ if RUBY_ENGINE == "jruby"
 else
   require "rake/extensiontask"
   Rake::ExtensionTask.new("digest")
-  %w[bubblebabble md5 rmd160 sha1 sha2].each do |ext|
+  %w[bubblebabble md5 rmd160 sha1 sha2 crc32].each do |ext|
     Rake::ExtensionTask.new("digest/#{ext}")
   end
 end
