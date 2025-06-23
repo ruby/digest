@@ -29,7 +29,7 @@ static const rb_digest_metadata_t md5 = {
  * MD5 calculates a digest of 128 bits (16 bytes).
  *
  * == Examples
- *  require 'digest'
+ *  require 'digest/md5'
  *
  *  # Compute a complete digest
  *  Digest::MD5.hexdigest 'abc'      #=> "90015098..."
