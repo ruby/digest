@@ -30,7 +30,7 @@ static const rb_digest_metadata_t sha1 = {
  * SHA-1 calculates a digest of 160 bits (20 bytes).
  *
  * == Examples
- *  require 'digest'
+ *  require 'digest/sha1'
  *
  *  # Compute a complete digest
  *  Digest::SHA1.hexdigest 'abc'      #=> "a9993e36..."
