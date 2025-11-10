@@ -3,3 +3,4 @@ README.md
 ext/digest/
 lib/digest.rb
 lib/digest/sha2.rb
+lib/digest/version.rb
