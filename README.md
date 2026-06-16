@@ -1,6 +1,6 @@
 # Digest
 
-![CI](https://github.com/ruby/digest/workflows/CI/badge.svg?branch=master&event=push)
+[![CI](https://github.com/ruby/digest/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/ruby/digest/actions/workflows/ci.yml)
 
 This module provides a framework for message digest libraries.
 
