@@ -364,6 +364,8 @@ public class RubyDigest {
 
     @JRubyClass(name="Digest::Class")
     public static class DigestClass extends RubyObject {
+        private static final long serialVersionUID = 1956465293454003972L;
+
         public DigestClass(Ruby runtime, RubyClass type) {
             super(runtime, type);
         }
@@ -397,7 +399,9 @@ public class RubyDigest {
 
     @JRubyClass(name="Digest::Base")
     public static class DigestBase extends RubyObject {
-        private MessageDigest algo;
+        private static final long serialVersionUID = -2526926208784906213L;
+
+        private transient MessageDigest algo;
         private int blockLength = 0;
 
         public DigestBase(Ruby runtime, RubyClass type) {
