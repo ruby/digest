@@ -49,6 +49,8 @@ import org.jruby.RubyString;
 import org.jruby.anno.JRubyClass;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
+import org.jruby.api.Access;
+import org.jruby.api.Define;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.Block;
 import org.jruby.runtime.ThreadContext;
@@ -91,15 +93,16 @@ public class RubyDigest {
         }
         catch (Throwable t) { /* provider is not available */ }
 
-        RubyModule mDigest = runtime.defineModule("Digest");
-        mDigest.defineAnnotatedMethods(RubyDigest.class);
-        RubyModule mDigestInstance = mDigest.defineModuleUnder("Instance");
-        mDigestInstance.defineAnnotatedMethods(DigestInstance.class);
-        RubyClass cDigestClass = mDigest.defineClassUnder("Class", runtime.getObject(), DigestClass::new);
-        cDigestClass.defineAnnotatedMethods(DigestClass.class);
-        cDigestClass.includeModule(mDigestInstance);
-        RubyClass cDigestBase = mDigest.defineClassUnder("Base", cDigestClass, DigestBase::new);
-        cDigestBase.defineAnnotatedMethods(DigestBase.class);
+        ThreadContext context = runtime.getCurrentContext();
+        RubyModule mDigest = Define.defineModule(context, "Digest");
+        mDigest.defineMethods(context, RubyDigest.class);
+        RubyModule mDigestInstance = mDigest.defineModuleUnder(context, "Instance");
+        mDigestInstance.defineMethods(context, DigestInstance.class);
+        RubyClass cDigestClass = mDigest.defineClassUnder(context, "Class", runtime.getObject(), DigestClass::new);
+        cDigestClass.defineMethods(context, DigestClass.class);
+        cDigestClass.includeModule(context, mDigestInstance);
+        RubyClass cDigestBase = mDigest.defineClassUnder(context, "Base", cDigestClass, DigestBase::new);
+        cDigestBase.defineMethods(context, DigestBase.class);
     }
 
     private static MessageDigest createMessageDigest(final String name) throws NoSuchAlgorithmException {
@@ -196,9 +199,10 @@ public class RubyDigest {
 
     public static void createDigestMD5(Ruby runtime) {
         runtime.getLoadService().require("digest");
-        RubyModule Digest = runtime.getModule("Digest");
-        RubyClass Base = Digest.getClass("Base");
-        RubyClass MD5 = Digest.defineClassUnder("MD5", Base, Base.getAllocator());
+        ThreadContext context = runtime.getCurrentContext();
+        RubyModule Digest = Access.getModule(context, "Digest");
+        RubyClass Base = Digest.getClass(context, "Base");
+        RubyClass MD5 = Digest.defineClassUnder(context, "MD5", Base, Base.getAllocator());
         MD5.setInternalVariable("metadata", new Metadata("MD5", 64));
     }
 
@@ -207,17 +211,19 @@ public class RubyDigest {
         if(provider == null) {
             throw runtime.newLoadError("RMD160 not supported without BouncyCastle");
         }
-        RubyModule Digest = runtime.getModule("Digest");
-        RubyClass Base = Digest.getClass("Base");
-        RubyClass RMD160 = Digest.defineClassUnder("RMD160", Base, Base.getAllocator());
+        ThreadContext context = runtime.getCurrentContext();
+        RubyModule Digest = Access.getModule(context, "Digest");
+        RubyClass Base = Digest.getClass(context, "Base");
+        RubyClass RMD160 = Digest.defineClassUnder(context, "RMD160", Base, Base.getAllocator());
         RMD160.setInternalVariable("metadata", new Metadata("RIPEMD160", 64));
     }
 
     public static void createDigestSHA1(Ruby runtime) {
         runtime.getLoadService().require("digest");
-        RubyModule Digest = runtime.getModule("Digest");
-        RubyClass Base = Digest.getClass("Base");
-        RubyClass SHA1 = Digest.defineClassUnder("SHA1", Base, Base.getAllocator());
+        ThreadContext context = runtime.getCurrentContext();
+        RubyModule Digest = Access.getModule(context, "Digest");
+        RubyClass Base = Digest.getClass(context, "Base");
+        RubyClass SHA1 = Digest.defineClassUnder(context, "SHA1", Base, Base.getAllocator());
         SHA1.setInternalVariable("metadata", new Metadata("SHA1", 64));
     }
 
@@ -231,55 +237,57 @@ public class RubyDigest {
             ex.initCause(e);
             throw ex;
         }
-        final RubyModule Digest = runtime.getModule("Digest");
-        final RubyClass Base = Digest.getClass("Base");
-        RubyClass SHA256 = Digest.defineClassUnder("SHA256", Base, Base.getAllocator());
+        ThreadContext context = runtime.getCurrentContext();
+        final RubyModule Digest = Access.getModule(context, "Digest");
+        final RubyClass Base = Digest.getClass(context, "Base");
+        RubyClass SHA256 = Digest.defineClassUnder(context, "SHA256", Base, Base.getAllocator());
         SHA256.setInternalVariable("metadata", new Metadata("SHA-256", 64));
-        RubyClass SHA384 = Digest.defineClassUnder("SHA384", Base, Base.getAllocator());
+        RubyClass SHA384 = Digest.defineClassUnder(context, "SHA384", Base, Base.getAllocator());
         SHA384.setInternalVariable("metadata", new Metadata("SHA-384", 128));
-        RubyClass SHA512 = Digest.defineClassUnder("SHA512", Base, Base.getAllocator());
+        RubyClass SHA512 = Digest.defineClassUnder(context, "SHA512", Base, Base.getAllocator());
         SHA512.setInternalVariable("metadata", new Metadata("SHA-512", 128));
     }
 
     public static void createDigestBubbleBabble(Ruby runtime) {
         runtime.getLoadService().require("digest");
-        RubyModule Digest = runtime.getModule("Digest");
-        RubyClass Base = Digest.getClass("Base");
-        RubyClass MD5 = Digest.defineClassUnder("BubbleBabble", Base, Base.getAllocator());
+        ThreadContext context = runtime.getCurrentContext();
+        RubyModule Digest = Access.getModule(context, "Digest");
+        RubyClass Base = Digest.getClass(context, "Base");
+        RubyClass MD5 = Digest.defineClassUnder(context, "BubbleBabble", Base, Base.getAllocator());
         MD5.setInternalVariable("metadata", new Metadata("BubbleBabble", 64));
     }
 
     @JRubyModule(name = "Digest::Instance")
     public static class DigestInstance {
 
-        private static IRubyObject throwUnimplError(IRubyObject self, String name) {
-            throw self.getRuntime().newRuntimeError(String.format("%s does not implement %s()", self.getMetaClass().getRealClass().getName(), name));
+        private static IRubyObject throwUnimplError(ThreadContext context, IRubyObject self, String name) {
+            throw self.getRuntime().newRuntimeError(String.format("%s does not implement %s()", self.getMetaClass().getRealClass().getName(context), name));
         }
 
         /* instance methods that should be overridden */
         @JRubyMethod(name = {"update", "<<"}, required = 1)
         public static IRubyObject update(ThreadContext context, IRubyObject self, IRubyObject arg) {
-            return throwUnimplError(self, "update");
+            return throwUnimplError(context, self, "update");
         }
 
         @JRubyMethod()
         public static IRubyObject finish(ThreadContext context, IRubyObject self) {
-            return throwUnimplError(self, "finish");
+            return throwUnimplError(context, self, "finish");
         }
 
         @JRubyMethod()
         public static IRubyObject reset(ThreadContext context, IRubyObject self) {
-            return throwUnimplError(self, "reset");
+            return throwUnimplError(context, self, "reset");
         }
 
         @JRubyMethod()
         public static IRubyObject digest_length(ThreadContext context, IRubyObject self) {
-            return digest(context, self, null).convertToString().bytesize();
+            return digest(context, self, null).convertToString().bytesize(context);
         }
 
         @JRubyMethod()
         public static IRubyObject block_length(ThreadContext context, IRubyObject self) {
-            return throwUnimplError(self, "block_length");
+            return throwUnimplError(context, self, "block_length");
         }
 
         /* instance methods that may be overridden */
@@ -288,7 +296,7 @@ public class RubyDigest {
             if(oth.isNil()) return context.fals;
 
             RubyString str1, str2;
-            RubyModule instance = (RubyModule)context.runtime.getModule("Digest").getConstantAt("Instance");
+            RubyModule instance = (RubyModule)Access.getModule(context, "Digest").getConstantAt(context, "Instance");
             if (oth.getMetaClass().getRealClass().hasModuleInHierarchy(instance)) {
                 str1 = digest(context, self, null).convertToString();
                 str2 = digest(context, oth, null).convertToString();
@@ -296,13 +304,13 @@ public class RubyDigest {
                 str1 = to_s(context, self).convertToString();
                 str2 = oth.convertToString();
             }
-            boolean ret = str1.bytesize().eql(str2.bytesize()) && (str1.eql(str2));
+            boolean ret = str1.bytesize(context).eql(str2.bytesize(context)) && (str1.eql(str2));
             return ret ? context.tru : context.fals;
         }
 
         @JRubyMethod()
         public static IRubyObject inspect(ThreadContext context, IRubyObject self) {
-            return RubyString.newStringNoCopy(self.getRuntime(), ByteList.plain("#<" + self.getMetaClass().getRealClass().getName() + ": " + hexdigest(context, self, null) + ">"));
+            return RubyString.newStringNoCopy(self.getRuntime(), ByteList.plain("#<" + self.getMetaClass().getRealClass().getName(context) + ": " + hexdigest(context, self, null) + ">"));
         }
 
         /* instance methods that need not usually be overridden */
@@ -407,7 +415,8 @@ public class RubyDigest {
         public DigestBase(Ruby runtime, RubyClass type) {
             super(runtime,type);
 
-            if(type == runtime.getModule("Digest").getClass("Base")) {
+            ThreadContext context = runtime.getCurrentContext();
+            if(type == Access.getModule(context, "Digest").getClass(context, "Base")) {
                 throw runtime.newNotImplementedError("Digest::Base is an abstract class");
             }
 
@@ -437,7 +446,7 @@ public class RubyDigest {
 
         @JRubyMethod(required = 1, visibility = Visibility.PRIVATE)
         @Override
-        public IRubyObject initialize_copy(IRubyObject obj) {
+        public IRubyObject initialize_copy(ThreadContext context, IRubyObject obj) {
             if (this == obj) return this;
 
             DigestBase from = (DigestBase) obj;
@@ -448,7 +457,7 @@ public class RubyDigest {
             }
             catch (CloneNotSupportedException e) {
                 String name = from.algo.getAlgorithm();
-                throw getRuntime().newTypeError("Could not initialize copy of digest (" + name + ")");
+                throw getRuntime().newRaiseException(getRuntime().getTypeError(), "Could not initialize copy of digest (" + name + ")");
             }
             return this;
         }
