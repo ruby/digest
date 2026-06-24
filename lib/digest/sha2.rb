@@ -27,7 +27,7 @@ module Digest
   #   digest (SHA512).
   #
   # ==Examples
-  #  require 'digest'
+  #  require 'digest/sha2'
   #
   #  # Compute a complete digest
   #  Digest::SHA2.hexdigest 'abc'          # => "ba7816bf8..."
