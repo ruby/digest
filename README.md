@@ -78,6 +78,9 @@ SHA2 family::
  SHA512
  SHA384
  SHA256
+BLAKE3::
+  As Digest::BLAKE3, producing a 256-bit digest.
+  See https://github.com/BLAKE3-team/BLAKE3.
 ```
 
 The latest versions of the FIPS publications can be found here: http://csrc.nist.gov/publications/PubsFIPS.html.
