@@ -24,7 +24,7 @@ static const rb_digest_metadata_t rmd160 = {
  * RMD160 calculates a digest of 160 bits (20 bytes).
  *
  * == Examples
- *  require 'digest'
+ *  require 'digest/rmd160'
  *
  *  # Compute a complete digest
  *  Digest::RMD160.hexdigest 'abc'      #=> "8eb208f7..."
