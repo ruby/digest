@@ -25,6 +25,21 @@ static ID id_metadata;
 
 RUBY_EXTERN void Init_digest_base(void);
 
+#ifdef RUBY_TYPED_EMBEDDABLE
+#  define HAVE_RUBY_TYPED_EMBEDDABLE 1
+#else
+# ifdef HAVE_CONST_RUBY_TYPED_EMBEDDABLE
+#  define RUBY_TYPED_EMBEDDABLE RUBY_TYPED_EMBEDDABLE
+#  define HAVE_RUBY_TYPED_EMBEDDABLE 1
+# else
+#  define RUBY_TYPED_EMBEDDABLE 0
+# endif
+#endif
+
+#ifndef RUBY_TYPED_THREAD_SAFE_FREE
+#define RUBY_TYPED_THREAD_SAFE_FREE RUBY_TYPED_FREE_IMMEDIATELY
+#endif
+
 /*
  * Document-module: Digest
  *
@@ -541,6 +556,8 @@ rb_digest_class_init(VALUE self)
 static const rb_data_type_t metadata_type = {
     "digest/metadata",
     {0},
+    0, 0,
+    (RUBY_TYPED_THREAD_SAFE_FREE|RUBY_TYPED_WB_PROTECTED),
 };
 
 RUBY_FUNC_EXPORTED VALUE
@@ -615,17 +632,53 @@ get_digest_obj_metadata(VALUE obj)
     return get_digest_base_metadata(rb_obj_class(obj));
 }
 
+typedef struct {
+    rb_digest_metadata_t *algo;
+    char embedded_data[1];
+} rb_digest_context_t;
+
+static inline size_t
+context_size(rb_digest_metadata_t *algo)
+{
+    return offsetof(rb_digest_context_t, embedded_data) + algo->ctx_size;
+}
+
+static size_t
+digest_memsize(const void *ptr)
+{
+#if RUBY_TYPED_EMBEDDABLE
+    return 0
+#else
+    const rb_digest_context_t *context = (const rb_digest_context_t *)ptr;
+    return context_size(context->algo);
+#endif
+}
+
 static const rb_data_type_t digest_type = {
     "digest",
-    {0, RUBY_TYPED_DEFAULT_FREE, 0,},
+    {0, RUBY_TYPED_DEFAULT_FREE, digest_memsize,},
     0, 0,
-    (RUBY_TYPED_FREE_IMMEDIATELY|RUBY_TYPED_WB_PROTECTED),
+    (RUBY_TYPED_THREAD_SAFE_FREE|RUBY_TYPED_WB_PROTECTED|RUBY_TYPED_EMBEDDABLE),
 };
 
-static inline void
-algo_init(const rb_digest_metadata_t *algo, void *pctx)
+static inline void *
+CONTEXT_PTR(rb_digest_context_t *context)
 {
-    if (algo->init_func(pctx) != 1) {
+    return context->embedded_data;
+}
+
+static inline rb_digest_context_t *
+DIGEST_GET_CONTEXT(VALUE self)
+{
+    rb_digest_context_t *context;
+    TypedData_Get_Struct(self, rb_digest_context_t, &digest_type, context);
+    return context;
+}
+
+static inline void
+context_init(rb_digest_context_t *context)
+{
+    if (context->algo->init_func(CONTEXT_PTR(context)) != 1) {
         rb_raise(rb_eRuntimeError, "Digest initialization failed.");
     }
 }
@@ -633,9 +686,9 @@ algo_init(const rb_digest_metadata_t *algo, void *pctx)
 static VALUE
 rb_digest_base_alloc(VALUE klass)
 {
+    rb_digest_context_t *context;
     rb_digest_metadata_t *algo;
     VALUE obj;
-    void *pctx;
 
     if (klass == rb_cDigest_Base) {
         rb_raise(rb_eNotImpError, "Digest::Base is an abstract class");
@@ -643,9 +696,10 @@ rb_digest_base_alloc(VALUE klass)
 
     algo = get_digest_base_metadata(klass);
 
-    obj = rb_data_typed_object_zalloc(klass, algo->ctx_size, &digest_type);
-    pctx = RTYPEDDATA_DATA(obj);
-    algo_init(algo, pctx);
+    obj = rb_data_typed_object_zalloc(klass, context_size(algo), &digest_type);
+    context = DIGEST_GET_CONTEXT(obj);
+    context->algo = algo;
+    context_init(context);
 
     return obj;
 }
@@ -667,7 +721,7 @@ rb_digest_base_copy(VALUE copy, VALUE obj)
 
     TypedData_Get_Struct(obj, void, &digest_type, pctx1);
     TypedData_Get_Struct(copy, void, &digest_type, pctx2);
-    memcpy(pctx2, pctx1, algo->ctx_size);
+    memcpy(pctx2, pctx1, context_size(algo));
 
     return copy;
 }
@@ -680,15 +734,7 @@ rb_digest_base_copy(VALUE copy, VALUE obj)
 static VALUE
 rb_digest_base_reset(VALUE self)
 {
-    rb_digest_metadata_t *algo;
-    void *pctx;
-
-    algo = get_digest_obj_metadata(self);
-
-    TypedData_Get_Struct(self, void, &digest_type, pctx);
-
-    algo_init(algo, pctx);
-
+    context_init(DIGEST_GET_CONTEXT(self));
     return self;
 }
 
@@ -702,15 +748,11 @@ rb_digest_base_reset(VALUE self)
 static VALUE
 rb_digest_base_update(VALUE self, VALUE str)
 {
-    rb_digest_metadata_t *algo;
-    void *pctx;
-
-    algo = get_digest_obj_metadata(self);
-
-    TypedData_Get_Struct(self, void, &digest_type, pctx);
+    rb_digest_context_t *context = DIGEST_GET_CONTEXT(self);
 
     StringValue(str);
-    algo->update_func(pctx, (unsigned char *)RSTRING_PTR(str), RSTRING_LEN(str));
+
+    context->algo->update_func(CONTEXT_PTR(context), (unsigned char *)RSTRING_PTR(str), RSTRING_LEN(str));
     RB_GC_GUARD(str);
 
     return self;
@@ -720,19 +762,14 @@ rb_digest_base_update(VALUE self, VALUE str)
 static VALUE
 rb_digest_base_finish(VALUE self)
 {
-    rb_digest_metadata_t *algo;
-    void *pctx;
     VALUE str;
+    rb_digest_context_t *context = DIGEST_GET_CONTEXT(self);
 
-    algo = get_digest_obj_metadata(self);
-
-    TypedData_Get_Struct(self, void, &digest_type, pctx);
-
-    str = rb_str_new(0, algo->digest_len);
-    algo->finish_func(pctx, (unsigned char *)RSTRING_PTR(str));
+    str = rb_str_new(0, context->algo->digest_len);
+    context->algo->finish_func(CONTEXT_PTR(context), (unsigned char *)RSTRING_PTR(str));
 
     /* avoid potential coredump caused by use of a finished context */
-    algo_init(algo, pctx);
+    context_init(context);
 
     return str;
 }
@@ -745,11 +782,8 @@ rb_digest_base_finish(VALUE self)
 static VALUE
 rb_digest_base_digest_length(VALUE self)
 {
-    rb_digest_metadata_t *algo;
-
-    algo = get_digest_obj_metadata(self);
-
-    return SIZET2NUM(algo->digest_len);
+    rb_digest_context_t *context = DIGEST_GET_CONTEXT(self);
+    return SIZET2NUM(context->algo->digest_len);
 }
 
 /*
@@ -760,11 +794,8 @@ rb_digest_base_digest_length(VALUE self)
 static VALUE
 rb_digest_base_block_length(VALUE self)
 {
-    rb_digest_metadata_t *algo;
-
-    algo = get_digest_obj_metadata(self);
-
-    return SIZET2NUM(algo->block_len);
+    rb_digest_context_t *context = DIGEST_GET_CONTEXT(self);
+    return SIZET2NUM(context->algo->block_len);
 }
 
 void
