@@ -58,6 +58,7 @@ import org.jruby.runtime.Visibility;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.ArraySupport;
 import org.jruby.util.ByteList;
+import org.jruby.util.TypeConverter;
 import org.jruby.util.log.Logger;
 import org.jruby.util.log.LoggerFactory;
 
@@ -302,7 +303,9 @@ public class RubyDigest {
                 str2 = digest(context, oth, null).convertToString();
             } else {
                 str1 = to_s(context, self).convertToString();
-                str2 = oth.convertToString();
+                IRubyObject converted = TypeConverter.checkStringType(context.runtime, oth);
+                if (converted.isNil()) return context.fals;
+                str2 = (RubyString) converted;
             }
             boolean ret = str1.bytesize(context).eql(str2.bytesize(context)) && (str1.eql(str2));
             return ret ? context.tru : context.fals;
