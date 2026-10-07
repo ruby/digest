@@ -267,7 +267,11 @@ rb_digest_instance_digest(int argc, VALUE *argv, VALUE self)
 static VALUE
 rb_digest_instance_digest_bang(VALUE self)
 {
-    VALUE value = rb_funcall(self, id_finish, 0);
+    VALUE value;
+
+    rb_check_frozen(self);
+
+    value = rb_funcall(self, id_finish, 0);
     rb_funcall(self, id_reset, 0);
 
     return value;
@@ -312,7 +316,11 @@ rb_digest_instance_hexdigest(int argc, VALUE *argv, VALUE self)
 static VALUE
 rb_digest_instance_hexdigest_bang(VALUE self)
 {
-    VALUE value = rb_funcall(self, id_finish, 0);
+    VALUE value;
+
+    rb_check_frozen(self);
+
+    value = rb_funcall(self, id_finish, 0);
     rb_funcall(self, id_reset, 0);
 
     return hexencode_str_new(value);
@@ -684,6 +692,8 @@ rb_digest_base_reset(VALUE self)
     rb_digest_metadata_t *algo;
     void *pctx;
 
+    rb_check_frozen(self);
+
     algo = get_digest_obj_metadata(self);
 
     TypedData_Get_Struct(self, void, &digest_type, pctx);
@@ -705,6 +715,8 @@ rb_digest_base_update(VALUE self, VALUE str)
 {
     rb_digest_metadata_t *algo;
     void *pctx;
+
+    rb_check_frozen(self);
 
     algo = get_digest_obj_metadata(self);
 
@@ -733,6 +745,7 @@ rb_digest_base_finish(VALUE self)
     algo->finish_func(pctx, (unsigned char *)RSTRING_PTR(str));
 
     /* avoid potential coredump caused by use of a finished context */
+    /* not frozen-checked: #digest and #hexdigest call this on a clone */
     algo_init(algo, pctx);
 
     return str;
