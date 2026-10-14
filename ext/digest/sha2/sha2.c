@@ -38,6 +38,10 @@
 #include <string.h>	/* memcpy()/memset() or bcopy()/bzero() */
 #include <assert.h>	/* assert() */
 #include "sha2.h"
+#include "../arm_crypto.h"
+#if defined(HAVE_ARM_CRYPTO_EXT)
+#include "sha256-arm.h"
+#endif
 
 /*
  * ASSERT NOTE:
@@ -393,6 +397,13 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	sha2_word32	T1, *W256;
 	int		j;
 
+#if defined(HAVE_ARM_CRYPTO_EXT)
+	if (rb_digest_have_arm_sha256()) {
+		sha256_process_arm(context->state, (const uint8_t *)data, SHA256_BLOCK_LENGTH);
+		return;
+	}
+#endif
+
 	W256 = (sha2_word32*)context->buffer;
 
 	/* Initialize registers with the prev. intermediate value */
@@ -450,6 +461,13 @@ void SHA256_Transform(SHA256_CTX* context, const sha2_word32* data) {
 	sha2_word32	a, b, c, d, e, f, g, h, s0, s1;
 	sha2_word32	T1, T2, *W256;
 	int		j;
+
+#if defined(HAVE_ARM_CRYPTO_EXT)
+	if (rb_digest_have_arm_sha256()) {
+		sha256_process_arm(context->state, (const uint8_t *)data, SHA256_BLOCK_LENGTH);
+		return;
+	}
+#endif
 
 	W256 = (sha2_word32*)context->buffer;
 
