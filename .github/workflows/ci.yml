@@ -37,6 +37,7 @@ jobs:
         exclude:
         - { os: windows-latest, ruby: debug }
         - { os: windows-latest, ruby: head }
+        - { os: macos-14,       ruby: head } # ruby-head binary is built on macOS 15 and passes -std=gnu23, unknown to Xcode 15 clang
 
     steps:
       - uses: actions/checkout@v6.0.3
