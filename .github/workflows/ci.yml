@@ -25,7 +25,8 @@ jobs:
         os:
         - ubuntu-24.04
         - ubuntu-22.04
-        - macos-14
+        - macos-26
+        - macos-15
         - macos-15-intel
         - windows-latest
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
@@ -54,7 +55,7 @@ jobs:
       - run: bundle exec rake build
 
       - run: bundle exec rake test
-        continue-on-error: ${{ matrix.ignore-error }}
+        continue-on-error: ${{ matrix.ignore-error || false }}
 
       - name: Integration test
         run: bundle exec rake check
