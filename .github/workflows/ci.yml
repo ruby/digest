@@ -55,7 +55,7 @@ jobs:
       - run: bundle exec rake build
 
       - run: bundle exec rake test
-        continue-on-error: ${{ matrix.ignore-error }}
+        continue-on-error: ${{ matrix.ignore-error || false }}
 
       - name: Integration test
         run: bundle exec rake check
