@@ -17,3 +17,21 @@ def digest_conf(name)
   $objs << "#{name}.#{$OBJEXT}"
   return
 end
+
+# Check whether this compiler on an aarch64/arm64 host can build +source+. Will
+# try with no additional cflags and also architecture specific flags when
+# compiling +source+.
+# 
+# Returns the flag that worked (nil if none was needed), or false if no
+# candidate compiled or the host isn't aarch64/arm64.
+def arm_crypto_flag(source)
+  return false unless RbConfig::CONFIG["host_cpu"] =~ /\A(aarch64|arm64)\z/i
+
+  [nil, "-march=armv8-a+crypto"].each do |flag|
+    label = "ARMv8 Crypto Extensions intrinsics" + (flag ? " (#{flag})" : "")
+    if checking_for(label) { try_compile(%{#include "#{$srcdir}/#{source}"\n}, flag) }
+      return flag
+    end
+  end
+  false
+end

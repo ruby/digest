@@ -18,6 +18,10 @@
  */
 
 #include "sha1.h"
+#include "../arm_crypto.h"
+#if defined(HAVE_ARM_CRYPTO_EXT)
+#include "sha1-arm.h"
+#endif
 
 #define SHA1HANDSOFF		/* Copies data before messing with it. */
 
@@ -140,6 +144,13 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64])
 
     _DIAGASSERT(buffer != 0);
     _DIAGASSERT(state != 0);
+
+#if defined(HAVE_ARM_CRYPTO_EXT)
+    if (rb_digest_have_arm_sha1()) {
+	sha1_process_arm(state, buffer, 64);
+	return;
+    }
+#endif
 
 #ifdef SHA1HANDSOFF
     block = &workspace;
