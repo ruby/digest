@@ -25,7 +25,7 @@ static const rb_digest_metadata_t crc32 = {
  *  require 'digest'
  *
  *  # Compute a complete digest
- *  Digest::CRC32.hexdigest 'abc'      #=> "8eb208f7..."
+ *  Digest::CRC32.hexdigest 'abc'      #=> "352441c2"
  *
  *  # Compute digest by chunks
  *  crc32 = Digest::CRC32.new               # =>#<Digest::CRC32>
