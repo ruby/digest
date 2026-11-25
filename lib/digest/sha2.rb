@@ -77,6 +77,7 @@ module Digest
     #
     # Reset the digest to the initial state and return self.
     def reset
+      raise FrozenError, "can't modify frozen #{self.class}" if frozen?
       @sha2.reset
       self
     end
@@ -87,6 +88,7 @@ module Digest
     #
     # Update the digest using a given _string_ and return self.
     def update(str)
+      raise FrozenError, "can't modify frozen #{self.class}" if frozen?
       @sha2.update(str)
       self
     end

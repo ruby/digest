@@ -81,6 +81,42 @@ module TestDigest
     assert_equal(md1, md2, self.class::ALGO)
   end
 
+  def test_frozen
+    md = self.class::ALGO.new
+    md << "a"
+    md.freeze
+
+    assert_raise(FrozenError) { md.update("b") }
+    assert_raise(FrozenError) { md << "b" }
+    assert_raise(FrozenError) { md.reset }
+    assert_raise(FrozenError) { md.digest! }
+    assert_raise(FrozenError) { md.hexdigest! }
+    assert_raise(FrozenError) { md.base64digest! }
+    assert_raise(FrozenError) { md.digest("b") }
+    assert_raise(FrozenError) { md.hexdigest("b") }
+
+    assert_equal(self.class::ALGO.hexdigest("a"), md.hexdigest)
+  end unless RUBY_ENGINE == "jruby"
+
+  def test_new_keeps_singleton
+    md = self.class::ALGO.new
+    md.extend(Module.new { def extended_marker; end })
+    def md.singleton_marker; end
+
+    assert_respond_to(md.new, :extended_marker)
+    assert_respond_to(md.new, :singleton_marker)
+  end
+
+  def test_frozen_copy
+    md = self.class::ALGO.new
+    md << "a"
+    md.freeze
+
+    assert_equal(self.class::ALGO.hexdigest("a"), md.clone.hexdigest)
+    assert_equal(self.class::ALGO.hexdigest("a"), md.dup.hexdigest)
+    assert_raise(FrozenError) { md.new }
+  end unless RUBY_ENGINE == "jruby"
+
   def test_s_file
     Tempfile.create("test_digest_file", mode: File::BINARY) { |tmpfile|
       str = "hello, world.\r\n"
@@ -173,6 +209,32 @@ module TestDigest
   end if defined?(Digest::SHA512)
 
   class TestSHA2 < Test::Unit::TestCase
+
+  def test_frozen
+    md = Digest::SHA2.new
+    md << "a"
+    md.freeze
+
+    assert_raise(FrozenError) { md.update("b") }
+    assert_raise(FrozenError) { md.reset }
+    assert_raise(FrozenError) { md.digest! }
+    assert_raise(FrozenError) { md.hexdigest! }
+    assert_raise(FrozenError) { md.base64digest! }
+    assert_raise(FrozenError) { md.digest("b") }
+    assert_raise(FrozenError) { md.hexdigest("b") }
+
+    assert_equal(Digest::SHA256.hexdigest("a"), md.hexdigest)
+  end unless RUBY_ENGINE == "jruby"
+
+  def test_frozen_copy
+    md = Digest::SHA2.new
+    md << "a"
+    md.freeze
+
+    assert_equal(Digest::SHA256.hexdigest("a"), md.clone.hexdigest)
+    assert_equal(Digest::SHA256.hexdigest("a"), md.dup.hexdigest)
+    assert_raise(FrozenError) { md.new }
+  end unless RUBY_ENGINE == "jruby"
 
   def test_s_file
     Tempfile.create("test_digest_file") { |tmpfile|
