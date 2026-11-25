@@ -84,4 +84,4 @@ task :check do
   end
 end
 
-task :default => :test
+task :default => [:compile, :test]
