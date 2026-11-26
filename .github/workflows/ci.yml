@@ -32,7 +32,8 @@ jobs:
         ruby: ${{ fromJson(needs.ruby-versions.outputs.versions) }}
         include:
         - { os: windows-latest, ruby: ucrt }
-        - { os: windows-latest, ruby: mswin }
+        - { os: windows-latest, ruby: mswin-head }
+        - { os: windows-latest, ruby: mswin-4.0 }
         - { os: ubuntu-22.04,   ruby: jruby }
         - { os: ubuntu-22.04,   ruby: jruby-head }
         exclude:
